@@ -13,12 +13,9 @@ const venueSchema = new Schema({
     minLength: 3,
     required: [true, "Please provide location"],
   },
-  lctname: {
-    type: String,
-  },
   capacity: {
     type: Number,
-    min: [0, 'Age must be a positive number'],
+    min: [0, "Age must be a positive number"],
     required: [true, "Please provide capacity"],
   },
   description: {
@@ -26,11 +23,6 @@ const venueSchema = new Schema({
     minLength: 5,
     required: [true, "Please provide description"],
   },
-});
-
-venueSchema.pre("save", function (next) {
-  this.lctname =  this.location.toLowerCase().replace(" ", "_");
-  next();
 });
 
 const Venue = model("venue", venueSchema);

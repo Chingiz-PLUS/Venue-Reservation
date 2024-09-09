@@ -1,42 +1,44 @@
+const REDIS_KEYS = require("../config/redis.constants");
 const Venue = require("../database/models/venue.model");
 const { NotFoundError } = require("../errors");
+const paginate = require("../utils/paginate.util");
+const redisUtil = require("../utils/redis.util");
 
 const venueService = {
   create: async (body) => {
     const venue = await Venue.create(body);
-    console.log(venue);
+    await redisUtil.removeData(REDIS_KEYS.VENUES);
     return venue;
   },
 
   getAll: async (query) => {
-    const { page, limit, location } = query;
+    let { page, limit, location } = query;
 
-    const currentPage = Math.max(parseInt(page, 10) || 1, 1);
-    const pageLimit = Math.max(parseInt(limit, 10) || 10, 10);
+    page = Math.max(parseInt(page, 10) || 1, 1);
+    limit = Math.max(parseInt(limit, 10) || 10, 10);
 
-    const skip = (currentPage - 1) * pageLimit;
-
-    const locationFilter = location ? { lctname: location } : {};
-    try {
-      const [totalVenuesCount, venues] = await Promise.all([
-        Venue.countDocuments(locationFilter),
-        Venue.find(locationFilter).skip(skip).limit(pageLimit).lean(),
-      ]);
-
-      return {
-        venues: venues,
-        pagination: {
-          totalPages: Math.ceil(totalVenuesCount / pageLimit),
-          totalCount: totalVenuesCount,
-          currentPage,
-          pageSize: venues.length,
-        },
-      };
-    } catch (error) {
-      // Handle the error (e.g., log it, return an error response, etc.)
-      console.error("Error fetching venues:", error);
-      throw new Error("Error fetching venues");
+    let venues = await redisUtil.getData(REDIS_KEYS.VENUES).catch(() => false);
+    if (!venues) {
+      try {
+        venues = await Venue.find({}).lean();
+        await redisUtil.setData(REDIS_KEYS.VENUES, venues);
+      } catch (error) {
+        console.error("Error fetching venues:", error);
+        throw new Error("Error fetching venues");
+      }
     }
+
+    const filter = {};
+    if (location) {
+      filter.location = location.split("_").join(" ");
+    }
+
+    let { items, ...pagination } = paginate(venues, page, limit, filter);
+
+    return {
+      venues: items,
+      pagination,
+    };
   },
 
   getOne: async (params) => {
