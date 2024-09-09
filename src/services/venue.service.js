@@ -64,15 +64,17 @@ const venueService = {
         new: true,
         runValidators: true,
       }
-    ).lean();
+    );
     if (!venue) throw new NotFoundError("This venue doesnt exist!");
     return venue;
   },
 
   delete: async (_id) => {
     const { id } = _id;
-    const result = await Venue.findByIdAndDelete(id).lean();
+    const result = await Venue.findByIdAndDelete(id);
     if (!result) throw new NotFoundError("This venue doesnt exist!");
+
+    await redisUtil.removeData(REDIS_KEYS.VENUES);
     return result;
   },
 };

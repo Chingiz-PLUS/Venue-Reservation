@@ -1,12 +1,11 @@
 const User = require("../database/models/user.model");
-const { NotFoundError, AppError } = require("../errors");
-
+const { AppError } = require("../errors");
 const bcrypt = require("bcryptjs");
 const jwtUtil = require("../utils/jwt.util");
 
 const authService = {
   register: async (body) => {
-    let checkExists = await User.findOne({
+    const checkExists = await User.findOne({
       $or: [{ email: body.email }, { username: body.username }],
     });
 
@@ -22,7 +21,7 @@ const authService = {
     };
   },
   login: async (body) => {
-    const user = await User.findOne({ email: body.email }).lean();
+    const user = await User.findOne({ email: body.email });
     let checkPassword;
     if (user)
       checkPassword = await bcrypt.compare(body.password, user.password);

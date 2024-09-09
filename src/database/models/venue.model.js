@@ -6,7 +6,6 @@ const venueSchema = new Schema({
     required: [true, "Please provide name"],
     minLength: 3,
     maxLength: 25,
-    unique: true,
   },
   location: {
     type: String,

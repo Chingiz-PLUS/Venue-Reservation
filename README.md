@@ -38,10 +38,17 @@ Follow these steps to set up the project locally:
     npm start
     ```
 
-5. Start the application in development mode:
+6. Start the application in development mode:
     ```bash
     npm run dev
     ```
+
+7. Start the application on the docker and start using Redis:
+    ```bash
+    docker-compose build
+    docker-compose up -d
+    ```
+   
 
 ## API Endpoints
 

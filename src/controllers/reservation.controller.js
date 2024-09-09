@@ -37,7 +37,7 @@ const getReservationController = async (req, res, next) => {
 
 const deleteReservationController = async (req, res, next) => {
   try {
-    const reservation = await reservationService.delete(req.params, req.user);
+    await reservationService.delete(req.params, req.user);
     res.json({
       message: "Selected Reservation is deleted",
     });

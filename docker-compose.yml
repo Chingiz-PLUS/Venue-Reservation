@@ -7,8 +7,10 @@ services:
       - "3001:3001"
     depends_on:
       - redis
+    env_file:
+      - .env
     environment:
-      REDIS_URL: redis://redis:6379 
+      - REDIS_URL=redis://redis:6379
     volumes:
       - .:/app
     command: npm start

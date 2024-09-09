@@ -2,7 +2,7 @@ const authService = require("../services/auth.service");
 
 const registerController = async (req, res, next) => {
   try {
-    let result = await authService.register(req.body);
+    const result = await authService.register(req.body);
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -10,7 +10,7 @@ const registerController = async (req, res, next) => {
 };
 const loginController = async (req, res, next) => {
   try {
-    let result = await authService.login(req.body);
+    const result = await authService.login(req.body);
     res.json({message: "Login successful!", ...result});
   } catch (error) {
     next(error);

@@ -1,8 +1,9 @@
 const Reservation = require("../database/models/reservation.model");
 const { AppError, NotFoundError } = require("../errors");
-const { Types } = require("mongoose");
 const ForbiddenError = require("../errors/forbidden.error");
 const Venue = require("../database/models/venue.model");
+const { sendMail } = require("../utils/mailer.util");
+const dateFns = require("date-fns");
 
 const reservationService = {
   create: async (body, user) => {
@@ -14,55 +15,56 @@ const reservationService = {
       venueId: body.venueId,
       date: body.date,
       time: body.time,
-    }).lean();
+    });
     if (haveReservation)
       throw new AppError("The reservation is already exist in this time", 409);
 
-    console.log("hey");
     const reservation = await Reservation.create({
-      userId: user._id,
       ...body,
+      userId: user._id,
     });
-    console.log("reservation");
+
+    const formattedDate = dateFns.format(body.date, "yyyy-MM-dd");
+    await sendMail({
+      to: user.email,
+      subject: "Reservation created",
+      text: `
+        Conguratulations! Your reservation for ${venue.name} is activated for ${formattedDate} ${body.time}
+      `,
+    }).catch(() => false);
+
     return reservation;
   },
 
   getUserReservations: async (user) => {
-    const reservations = await Reservation.find({ userId: user._id }).lean();
-
-    if (reservations.length==0)
-      throw new NotFoundError("This user doesn't have any reservations");
-    
+    const reservations = await Reservation.find({ userId: user._id });
     return reservations;
   },
 
   getReservation: async (params, user) => {
     const { id } = params;
-    let reservation = await Reservation.findById(id).lean();
+    const reservation = await Reservation.findById(id);
 
     if (!reservation) throw new NotFoundError("The reservation is not found!");
 
-    const userId = new Types.ObjectId(user._id);
-    if (user.role == "admin") return reservation;
+    if (!user._id.equals(reservation.userId) && user.role != "admin")
+      throw new ForbiddenError();
 
-    if (userId.equals(reservation.userId)) return reservation;
-
-    throw new ForbiddenError();
+    return reservation;
   },
 
   delete: async (params, user) => {
     const { id } = params;
-    const userId = new Types.ObjectId(user._id);
 
-    let reservation = await Reservation.findById(id).lean();
+    const reservation = await Reservation.findById(id);
 
     if (!reservation) throw new NotFoundError("The reservation is not found!");
 
-    if (user.role == "admin") return reservation;
+    if (!user._id.equals(reservation.userId) && user.role != "admin")
+      throw new ForbiddenError();
 
-    if (userId.equals(reservation.userId)) return reservation;
-
-    throw new ForbiddenError();
+    await reservation.deleteOne();
+    return reservation;
   },
 };
 

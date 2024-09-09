@@ -21,7 +21,7 @@ const authMiddleware = (role = null) => {
     if (payload) {
       const { userId } = payload;
 
-      const user = await User.findById(userId).lean();
+      const user = await User.findById(userId);
 
       if (!user) throw new UnauthorizedError();
       if ((role && user.role == role) || role == "user/admin") {
