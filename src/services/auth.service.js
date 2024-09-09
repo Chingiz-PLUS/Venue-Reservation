@@ -1,7 +1,7 @@
 const User = require("../database/models/user.model");
 const { NotFoundError, AppError } = require("../errors");
 
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwtUtil = require("../utils/jwt.util");
 
 const authService = {

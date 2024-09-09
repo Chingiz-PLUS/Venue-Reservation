@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new Schema({
   username: {
@@ -17,8 +17,8 @@ const userSchema = new Schema({
   password: { type: String, required: true, minLength: 8 },
   role: {
     type: String,
-    enum: ['user', 'admin'],
-    default: 'user', 
+    enum: ["user", "admin"],
+    default: "user",
   },
 });
 
