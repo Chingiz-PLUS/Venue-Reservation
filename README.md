@@ -16,43 +16,44 @@
 Follow these steps to set up the project locally:
 
 1. Clone the repository:
-    ```bash
-    git clone https://github.com/Chingiz-PLUS/Venue-Reservation
-    ```
+
+   ```bash
+   git clone https://github.com/Chingiz-PLUS/Venue-Reservation
+   ```
 
 2. Navigate to the project directory:
-    ```bash
-    cd Venue-Reservation
-    ```
+
+   ```bash
+   cd Venue-Reservation
+   ```
 
 3. Install the dependencies:
-    ```bash
-    npm install
-    ```
 
-4. Create a `.env` file in the root directory and follow variables from .env.example.js file:
+   ```bash
+   npm install
+   ```
 
+4. Create a `.env` file in the root directory and follow variables from .env.example.js file.
+   If you provide smtp details in .env, it will send mail about reservation creation to client.
 
 5. Start the application:
-    ```bash
-    npm start
-    ```
+
+   ```bash
+   npm start
+   ```
 
 6. Start the application in development mode:
-    ```bash
-    npm run dev
-    ```
+
+   ```bash
+   npm run dev
+   ```
 
 7. Start the application on the docker and start using Redis:
-    ```bash
-    docker-compose build
-    docker-compose up -d
-    ```
-   
+   ```bash
+   docker-compose build
+   docker-compose up -d
+   ```
 
 ## API Endpoints
 
 For API endpoints please import openApi.json to Postman
-
-
-
